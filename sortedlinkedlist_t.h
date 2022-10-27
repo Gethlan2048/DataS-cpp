@@ -1,7 +1,8 @@
 
 #pragma once
-template<class ItemType>struct NodeType;
-template<class ItemType>
+enum RelationType {LESS, EQUAL, GREATER};
+template <class ItemType> struct NodeType;
+template <class ItemType>
 class SortedType
 {
 public:
@@ -16,32 +17,44 @@ public:
     void DeleteItem(ItemType item);
     void ResetList();
     ItemType GetNextItem();
-
-private:
-    NodeType<ItemType>* listData;
+    RelationType ComparedTo(ItemType value, ItemType otherItem);
+ private : 
+    NodeType<ItemType> *listData;
     int length;
-    NodeType<ItemType>* currentPos;
+    NodeType<ItemType> *currentPos;
 };
-template<class ItemType>
+/*
+template <class ItemType>
+void FindItem(NodeType<ItemType> *listData, ItemType item,
+              NodeType<ItemType> *&location, NodeType<ItemType> *&predLoc, bool &found)
+{
+    bool moreToSearch = true;
+
+    location = listData->next;
+    predLoc = listData;
+    found = false;
+    while
+}*/
+template <class ItemType>
 struct NodeType
 {
     ItemType info;
     NodeType<ItemType> *next;
 };
-template<class ItemType>
+template <class ItemType>
 SortedType<ItemType>::SortedType()
 {
     length = 0;
     listData = NULL;
 }
 
-template<class ItemType>
+template <class ItemType>
 bool SortedType<ItemType>::IsFull() const
 {
-    NodeType *location;
+    NodeType<ItemType>* location;
     try
     {
-        location = new NodeType;
+        location = new NodeType<ItemType>;
         delete location;
         return false;
     }
@@ -51,16 +64,16 @@ bool SortedType<ItemType>::IsFull() const
     }
 }
 
-template<class ItemType>
+template <class ItemType>
 int SortedType<ItemType>::GetLength() const
 {
     return length;
 }
 
-template<class ItemType>
+template <class ItemType>
 void SortedType<ItemType>::MakeEmpty()
 {
-    NodeType *tempPtr;
+    NodeType<ItemType> *tempPtr;
 
     while (listData != NULL)
     {
@@ -71,11 +84,11 @@ void SortedType<ItemType>::MakeEmpty()
     length = 0;
 }
 
-template<class ItemType>
+template <class ItemType>
 ItemType SortedType<ItemType>::GetItem(ItemType item)
 {
     bool moreToSearch;
-    NodeType *location;
+    NodeType<ItemType>* location;
 
     location = listData;
     bool found = false;
@@ -83,7 +96,7 @@ ItemType SortedType<ItemType>::GetItem(ItemType item)
 
     while (moreToSearch && !found)
     {
-        switch (item.ComparedTo(location->info))
+        switch (ComparedTo(item, location->info))
         {
         case GREATER:
             location = location->next;
@@ -101,12 +114,12 @@ ItemType SortedType<ItemType>::GetItem(ItemType item)
     return item;
 }
 
-template<class ItemType>
+template <class ItemType>
 void SortedType<ItemType>::PutItem(ItemType item)
 {
-    NodeType<ItemType>* newNode;
-    NodeType<ItemType>* predLoc;
-    NodeType<ItemType>* location;
+    NodeType<ItemType> *newNode;
+    NodeType<ItemType> *predLoc;
+    NodeType<ItemType> *location;
     bool moreToSearch;
 
     location = listData;
@@ -115,7 +128,7 @@ void SortedType<ItemType>::PutItem(ItemType item)
     // find insertion point
     while (moreToSearch)
     {
-        switch (item.ComparedTo(location->info))
+        switch (ComparedTo(item, location->info))
         {
         case GREATER:
             predLoc = location;
@@ -141,56 +154,68 @@ void SortedType<ItemType>::PutItem(ItemType item)
     }
     length++;
 }
-template<class ItemType>
+template <class ItemType>
 void SortedType<ItemType>::DeleteItem(ItemType item)
 {
-    NodeType<ItemType>*location = listData;
-    NodeType<ItemType>* tempLocation;
+    NodeType<ItemType> *location = listData;
+    NodeType<ItemType> *tempLocation;
 
-    //Locate node to be deleted.
-    if (item.ComparedTo(listData->info) == EQUAL)
+    // Locate node to be deleted.
+    if (ComparedTo(item, listData->info) == EQUAL)
     {
         tempLocation = location;
-        listData = listData->next; //Delete first Node
+        listData = listData->next; // Delete first Node
         length--;
     }
     else
-    while (location->next != NULL)
-    {
-        while (item.ComparedTo((location->next)->info) != EQUAL || location->next != NULL)
+        while (location->next != NULL)
         {
-            location = location->next;
+            while (ComparedTo(item, (location->next)->info) != EQUAL || location->next != NULL)
+            {
+                location = location->next;
+            }
+            if (ComparedTo(item, (location->next)->info) == EQUAL)
+            {
+                tempLocation = location->next;
+                location->next = (location->next)->next;
+                length--;
+            }
         }
-        if (item.ComparedTo((location->next)->info) == EQUAL)
-        {
-        tempLocation = location->next;
-        location->next = (location->next)->next;
-        length--;
-    }
-    }
-    delete tempLocation;   
+    delete tempLocation;
 }
-template<class ItemType>
+template <class ItemType>
 void SortedType<ItemType>::ResetList()
 {
     currentPos = NULL;
 }
-template<class ItemType>
+template <class ItemType>
 SortedType<ItemType>::~SortedType()
 {
-    NodeType<ItemType>* tempPtr;
-    
-    while(listData != NULL)
+    NodeType<ItemType> *tempPtr;
+
+    while (listData != NULL)
     {
         tempPtr = listData;
         listData = listData->next;
         delete tempPtr;
     }
 }
+template<class ItemType>
+RelationType SortedType<ItemType>::ComparedTo(ItemType value, ItemType otherItem)
+{
 
-
-
-
+    if (value < otherItem)
+    {
+        return LESS;
+    }
+    else if (value > otherItem)
+    {
+        return GREATER;
+    }
+    else
+        return EQUAL;
+}
+;
 /*
 void MergeList(SortedType list1, SortedType list2, SortedType &result)
 {
