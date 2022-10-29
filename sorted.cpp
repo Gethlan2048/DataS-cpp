@@ -1,6 +1,6 @@
 #include<iostream>
 #include<string.h>
-#include"sortedlinkedlist_t1.h"
+#include"sortedlinkedlist_t.h"
 int main()
 {
     using namespace std;
