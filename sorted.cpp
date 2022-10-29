@@ -1,14 +1,11 @@
 #include<iostream>
 #include<string.h>
-#include"sortedlinkedlist_t.h"
+#include"sortedlinkedlist_t1.h"
 int main()
 {
     using namespace std;
     SortedType<int> list1;
-    SortedType<string> list2;
  
-    list2.PutItem("Blaine");
-    cout<< list2.GetItem("Blaine");
     list1.PutItem(121212);
     list1.PutItem(32);
     list1.GetItem(121212);
